@@ -9,23 +9,25 @@
 import UIKit
 
 class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
         
         //call article metadata
-        fetchRequest()
+        fetchRequest(sitename: site)
     }
-
+    
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
-
-    func fetchRequest()
+    
+    var site = "engadget"
+    
+    func fetchRequest(sitename publisher : String)
     {
-        var urlString = "https://newsapi.org/v1/articles?source=engadget&sortBy=top&apiKey=de2091da5b29434c9bace5cfa328c058"
+        var urlString = "https://newsapi.org/v1/articles?source=\(publisher)&sortBy=top&apiKey=de2091da5b29434c9bace5cfa328c058"
         
         let request = URLRequest(url: URL(string: urlString)!)
         
@@ -36,7 +38,7 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
             
             if error != nil
             {
-                print ("Error is nil")
+                print ("There is an error. error is not nil.")
                 return //cancel the fetch
             }
             
@@ -67,11 +69,18 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
                         self.articlesArray?.append(article)
                     }
                 }
+                //Executes code within brackets in main thread
+                DispatchQueue.main.async
+                    {
+                        //reload the Table View and display articles
+                        self.outletTableView.reloadData()
+                }
                 
             } catch let error
-            {   print(error)    }
-            
+            {   print("Error caught. Operation aborted. error message: \(error)")    }
         }
+        //executes URLSession
+        urlSessionDataTask.resume()
     }
     
     var articlesArray : [Article]? = []
@@ -82,7 +91,13 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         let field = outletTableView.dequeueReusableCell(withIdentifier: "fieldArticle", for: indexPath) as! ArticleField
         
         //testing w/ hardcoded value
-        field.outletHeading.text = "display heading"
+        //field.outletHeading.text = "display heading"
+        
+        field.outletAuthor.text = self.articlesArray?[indexPath.item].author
+        field.outletDate.text = self.articlesArray?[indexPath.item].date
+        field.outletHeading.text = self.articlesArray?[indexPath.item].heading
+        field.outletDescription.text = self.articlesArray?[indexPath.item].descriptionArticle
+        
         
         return field
     }
@@ -100,7 +115,17 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         } else
         { return 0 }
     }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let WebView = UIStoryboard.init(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "webview") as! VCWeb
+        //Storyboard ID: webview
+        
+        WebView.urlPage = self.articlesArray?[indexPath.item].url
+        
+        self.present(WebView, animated: true, completion: nil)
+    }
 }
+
 
 //requires UIKit. declares NSObject
 class Article: NSObject {
@@ -127,8 +152,75 @@ class ArticleField: UITableViewCell {
     }
     
     @IBOutlet weak var outletAuthor: UILabel!
+    @IBOutlet weak var outletDate: UILabel!
     @IBOutlet weak var outletHeading: UILabel!
     @IBOutlet weak var outletDescription: UILabel!
 
+}
+
+
+//requires UIKit.
+class VCWeb: UIViewController {
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        // Do any additional setup after loading the view.
+        
+        
+        outletWebView.loadRequest(URLRequest(url: URL(string: urlPage!)!))
+    }
+    
+    override func didReceiveMemoryWarning() {
+        super.didReceiveMemoryWarning()
+        // Dispose of any resources that can be recreated.
+    }
+    
+    
+    /*
+     // MARK: - Navigation
+     
+     // In a storyboard-based application, you will often want to do a little preparation before navigation
+     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+     // Get the new view controller using segue.destinationViewController.
+     // Pass the selected object to the new view controller.
+     }
+     */
+    
+    @IBOutlet weak var outletWebView: UIWebView!
+    
+    var urlPage : String?
+}
+
+
+//requires UIKit.
+class VCSource: UIViewController {
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        // Do any additional setup after loading the view.
+    }
+    
+    override func didReceiveMemoryWarning() {
+        super.didReceiveMemoryWarning()
+        // Dispose of any resources that can be recreated.
+    }
+    
+    
+    /*
+     // MARK: - Navigation
+     
+     // In a storyboard-based application, you will often want to do a little preparation before navigation
+     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+     // Get the new view controller using segue.destinationViewController.
+     // Pass the selected object to the new view controller.
+     }
+     */
+    
+    
+    
+    
+    
     
 }
