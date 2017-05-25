@@ -7,8 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		485D84641EBC6543000C0563 /* TVCTripInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 485D84631EBC6543000C0563 /* TVCTripInfo.swift */; };
-		485D84661EBC665D000C0563 /* TVCTrips.swift in Sources */ = {isa = PBXBuildFile; fileRef = 485D84651EBC665D000C0563 /* TVCTrips.swift */; };
 		48ACD1D61EB3285300A517FD /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48ACD1D51EB3285300A517FD /* AppDelegate.swift */; };
 		48ACD1D81EB3285300A517FD /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48ACD1D71EB3285300A517FD /* ViewController.swift */; };
 		48ACD1DB1EB3285300A517FD /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 48ACD1D91EB3285300A517FD /* Main.storyboard */; };
@@ -36,8 +34,6 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		485D84631EBC6543000C0563 /* TVCTripInfo.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TVCTripInfo.swift; sourceTree = "<group>"; };
-		485D84651EBC665D000C0563 /* TVCTrips.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TVCTrips.swift; sourceTree = "<group>"; };
 		48ACD1D21EB3285300A517FD /* Assignment2.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Assignment2.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		48ACD1D51EB3285300A517FD /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		48ACD1D71EB3285300A517FD /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -104,8 +100,6 @@
 				48ACD1D51EB3285300A517FD /* AppDelegate.swift */,
 				48ACD1D71EB3285300A517FD /* ViewController.swift */,
 				48ACD1D91EB3285300A517FD /* Main.storyboard */,
-				485D84631EBC6543000C0563 /* TVCTripInfo.swift */,
-				485D84651EBC665D000C0563 /* TVCTrips.swift */,
 				48ACD1DC1EB3285300A517FD /* Assets.xcassets */,
 				48ACD1DE1EB3285300A517FD /* LaunchScreen.storyboard */,
 				48ACD1E11EB3285300A517FD /* Info.plist */,
@@ -265,9 +259,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				485D84661EBC665D000C0563 /* TVCTrips.swift in Sources */,
 				48ACD1D81EB3285300A517FD /* ViewController.swift in Sources */,
-				485D84641EBC6543000C0563 /* TVCTripInfo.swift in Sources */,
 				48ACD1D61EB3285300A517FD /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
