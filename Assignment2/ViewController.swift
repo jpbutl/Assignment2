@@ -14,8 +14,6 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
         
-        //call article metadata
-        fetchRequest(sitename: site)
     }
     
     override func didReceiveMemoryWarning() {
@@ -23,11 +21,11 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         // Dispose of any resources that can be recreated.
     }
     
-    var site = "engadget"
-    
-    func fetchRequest(sitename publisher : String)
+    //get article list & their details from the specified sitename
+
+    func fetchRequest(sitename passedUrl : String)
     {
-        var urlString = "https://newsapi.org/v1/articles?source=\(publisher)&sortBy=top&apiKey=de2091da5b29434c9bace5cfa328c058"
+        var urlString = "\(passedUrl)"
         
         let request = URLRequest(url: URL(string: urlString)!)
         
@@ -57,21 +55,21 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
                         let article = Article()
                         
                         //parse article details
-                        if let author = dictArticle["author"] as? String, let heading = dictArticle["title"] as? String, let description = dictArticle["description"] as? String, let url = dictArticle["url"] as? String, let date = dictArticle["publishedAt"] as? String
+                        if let author = dictArticle["author"] as? String, let heading = dictArticle["title"] as? String, let description = dictArticle["description"] as? String, let url = dictArticle["url"] as? String //, let date = dictArticle["publishedAt"] as? Date
                         {
                             //assign the constants that were just defined to an instance of type Article
                             article.author = author
                             article.heading = heading
                             article.descriptionArticle = description
                             article.url = url
-                            article.date = date
+                            //article.date = date
                         }
                         self.articlesArray?.append(article)
                     }
                 }
                 //Executes code within brackets in main thread
                 DispatchQueue.main.async
-                    {
+                {
                         //reload the Table View and display articles
                         self.outletTableView.reloadData()
                 }
@@ -83,24 +81,6 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         urlSessionDataTask.resume()
     }
     
-    var articlesArray : [Article]? = []
-    
-    @IBOutlet weak var outletTableView: UITableView!
-    
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let field = outletTableView.dequeueReusableCell(withIdentifier: "fieldArticle", for: indexPath) as! ArticleField
-        
-        //testing w/ hardcoded value
-        //field.outletHeading.text = "display heading"
-        
-        field.outletAuthor.text = self.articlesArray?[indexPath.item].author
-        field.outletDate.text = self.articlesArray?[indexPath.item].date
-        field.outletHeading.text = self.articlesArray?[indexPath.item].heading
-        field.outletDescription.text = self.articlesArray?[indexPath.item].descriptionArticle
-        
-        
-        return field
-    }
     
     func numberOfSections(in tableView: UITableView) -> Int {
         return 1
@@ -116,6 +96,29 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         { return 0 }
     }
     
+    
+    var articlesArray : [Article]? = []
+    
+    @IBOutlet weak var outletTableView: UITableView!
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let field = outletTableView.dequeueReusableCell(withIdentifier: "fieldArticle", for: indexPath) as! ArticleField
+        
+        
+        //let dateFormatter = DateFormatter()
+        //dateFormatter.dateFormat = "dd/MM/yy"  //could or might have to declare date of type Date  e.g. var date : Date
+        
+        
+        //display article details in fieldArticle
+        field.outletAuthor.text = self.articlesArray?[indexPath.item].author
+        //field.outletDate.text = dateFormatter.string(from: (self.articlesArray?[indexPath.item].date)!)
+        field.outletHeading.text = self.articlesArray?[indexPath.item].heading
+        field.outletDescription.text = self.articlesArray?[indexPath.item].descriptionArticle
+        
+        
+        return field
+    }
+    
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let WebView = UIStoryboard.init(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "webview") as! VCWeb
         //Storyboard ID: webview
@@ -127,11 +130,11 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
 }
 
 
-//requires UIKit. declares NSObject
+//requires UIKit. inherits NSObject
 class Article: NSObject {
     
     var author : String?
-    var date : String?
+    //var date : Date?
     var heading : String?
     var descriptionArticle : String?
     var url : String?
@@ -194,12 +197,14 @@ class VCWeb: UIViewController {
 
 
 //requires UIKit.
-class VCSource: UIViewController {
+class VCSource: UIViewController, UITableViewDelegate, UITableViewDataSource {
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
         // Do any additional setup after loading the view.
+        
+        SourceList.loadSourceList()
     }
     
     override func didReceiveMemoryWarning() {
@@ -221,6 +226,92 @@ class VCSource: UIViewController {
     
     
     
+    //number of sections in my table
+    func numberOfSections(in tableView: UITableView) -> Int {
+        return 1
+    }
     
+    //fills in rows based on number of elements in my array
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return SourceList.list.count;
+    }
     
+   
+    
+    @IBOutlet weak var outletTableViewForVCSource: UITableView!
+    
+    //fill the table view
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let fieldVCSource = outletTableViewForVCSource.dequeueReusableCell(withIdentifier: "sourceName", for: indexPath) as! SourceField
+        
+        //display source's name in sourceName
+        fieldVCSource.outletNewsSourceName.text = "\(SourceList.list[indexPath.item].sourceName)"
+        
+        return fieldVCSource
+    }
+
+    
+
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let instanceOfVC = UIStoryboard.init(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "viewcontroller") as! ViewController
+        //Storyboard ID: viewcontroller
+        
+        
+        instanceOfVC.fetchRequest(sitename: SourceList.list[indexPath.item].sourceUrlToPass)
+        
+        self.present(instanceOfVC, animated: true, completion: nil)
+    }
+    
+}
+
+
+//requires UIKit.
+class SourceField: UITableViewCell {
+    
+    override func awakeFromNib() {
+        super.awakeFromNib()
+        // Initialization code
+    }
+    
+    override func setSelected(_ selected: Bool, animated: Bool) {
+        super.setSelected(selected, animated: animated)
+        
+        // Configure the view for the selected state
+    }
+    
+    @IBOutlet weak var outletNewsSourceName: UILabel!
+
+}
+
+
+class Source {
+    var sourceUrlToPass : String
+    var sourceName : String
+    
+    init(source : String, urlToPass : String) {
+        self.sourceName = source
+        self.sourceUrlToPass = urlToPass
+    }
+}
+
+class SourceList {
+    static var list : [Source] = []
+    static func loadSourceList()
+    {
+        let key = "de2091da5b29434c9bace5cfa328c058"
+        
+        list = [
+            Source(source : "Engadget", urlToPass : "https://newsapi.org/v1/articles?source=engadget&sortBy=top&apiKey=\(key)"),
+            Source(source : "Ars Technica", urlToPass : "https://newsapi.org/v1/articles?source=ars-technica&sortBy=top&apiKey=\(key)"),
+            Source(source : "Business Insider", urlToPass : "https://newsapi.org/v1/articles?source=business-insider&sortBy=top&apiKey=\(key)"),
+            Source(source : "Mashable", urlToPass : "https://newsapi.org/v1/articles?source=mashable&sortBy=top&apiKey=\(key)"),
+            Source(source : "Reuters", urlToPass : "https://newsapi.org/v1/articles?source=reuters&sortBy=top&apiKey=\(key)"),
+            Source(source : "The Verge", urlToPass : "https://newsapi.org/v1/articles?source=the-verge&sortBy=top&apiKey=\(key)"),
+            Source(source : "Newsweek", urlToPass : "https://newsapi.org/v1/articles?source=newsweek&sortBy=top&apiKey=\(key)"),
+            Source(source : "Time", urlToPass : "https://newsapi.org/v1/articles?source=time&sortBy=top&apiKey=\(key)"),
+            Source(source : "Fortune", urlToPass : "https://newsapi.org/v1/articles?source=fortune&sortBy=top&apiKey=\(key)"),
+            Source(source : "Usa Today", urlToPass : "https://newsapi.org/v1/articles?source=usa-today&sortBy=top&apiKey=\(key)"),
+            Source(source : "The Economist", urlToPass : "https://newsapi.org/v1/articles?source=the-economist&sortBy=top&apiKey=\(key)")
+        ]
+    }
 }
